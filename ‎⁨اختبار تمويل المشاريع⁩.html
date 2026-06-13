@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>اختبار تفاعلي – تمويل المشاريع</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+  :root {
+    --navy: #1F3864;
+    --blue: #2E75B6;
+    --lightblue: #D6E4F0;
+    --green: #1a7a4a;
+    --greenlight: #d4f0e2;
+    --red: #c0392b;
+    --redlight: #fde8e6;
+    --gold: #c9a84c;
+    --bg: #f0f4f8;
+    --white: #ffffff;
+    --text: #1a1a2e;
+    --gray: #6b7280;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+    color: white;
+    padding: 28px 24px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: -40px;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: -30px;
+    width: 250px; height: 250px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+  .header h1 { font-size: 1.7rem; font-weight: 900; margin-bottom: 6px; position: relative; z-index:1; }
+  .header p { font-size: 0.95rem; opacity: 0.85; position: relative; z-index:1; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    overflow-x: auto;
+    background: var(--navy);
+    padding: 0 12px;
+    gap: 4px;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex-shrink: 0;
+    padding: 10px 14px;
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: white; }
+  .tab-btn.active {
+    color: white;
+    border-bottom-color: var(--gold);
+  }
+
+  /* PROGRESS */
+  .progress-bar {
+    background: #dde3ea;
+    height: 6px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue), var(--gold));
+    transition: width 0.4s ease;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 16px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.82rem;
+  }
+  .stat { text-align: center; }
+  .stat-val { font-size: 1.1rem; font-weight: 700; color: var(--navy); }
+  .stat-val.green { color: var(--green); }
+  .stat-val.red { color: var(--red); }
+  .stat-label { color: var(--gray); font-size: 0.75rem; }
+
+  /* MAIN */
+  .main { padding: 16px; max-width: 720px; margin: 0 auto; }
+
+  /* QUESTION CARD */
+  .question-card {
+    background: white;
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(31,56,100,0.08);
+    border-right: 4px solid var(--blue);
+    transition: box-shadow 0.2s;
+  }
+  .question-card:hover { box-shadow: 0 4px 20px rgba(31,56,100,0.13); }
+
+  .q-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .q-number {
+    background: var(--navy);
+    color: white;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .q-section {
+    font-size: 0.75rem;
+    color: var(--blue);
+    font-weight: 600;
+    background: var(--lightblue);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .q-text {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.7;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  /* OPTIONS */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    text-align: right;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.92rem;
+    color: var(--text);
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--blue);
+    background: var(--lightblue);
+  }
+  .option-btn .opt-letter {
+    flex-shrink: 0;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--lightblue);
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .option-btn:hover:not(:disabled) .opt-letter {
+    background: var(--blue);
+    color: white;
+  }
+  .option-btn.correct {
+    border-color: var(--green);
+    background: var(--greenlight);
+  }
+  .option-btn.correct .opt-letter {
+    background: var(--green);
+    color: white;
+  }
+  .option-btn.wrong {
+    border-color: var(--red);
+    background: var(--redlight);
+  }
+  .option-btn.wrong .opt-letter {
+    background: var(--red);
+    color: white;
+  }
+  .option-btn:disabled { cursor: default; }
+
+  /* FEEDBACK */
+  .feedback {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    display: none;
+  }
+  .feedback.correct { background: var(--greenlight); color: var(--green); border-right: 3px solid var(--green); }
+  .feedback.wrong { background: var(--redlight); color: var(--red); border-right: 3px solid var(--red); }
+
+  /* NAV BUTTONS */
+  .nav-btns {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 16px 0 24px;
+    flex-wrap: wrap;
+  }
+  .nav-btn {
+    padding: 11px 24px;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-prev { background: #e5e7eb; color: var(--navy); }
+  .btn-prev:hover { background: #d1d5db; }
+  .btn-next { background: var(--navy); color: white; }
+  .btn-next:hover { background: var(--blue); }
+  .btn-result { background: var(--gold); color: white; }
+  .btn-result:hover { background: #b8922a; }
+
+  /* RESULT SCREEN */
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 32px 16px;
+  }
+  .result-circle {
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    border: 8px solid var(--blue);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    background: white;
+  }
+  .result-score { font-size: 2.2rem; font-weight: 900; color: var(--navy); }
+  .result-total { font-size: 0.85rem; color: var(--gray); }
+  .result-title { font-size: 1.4rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .result-sub { color: var(--gray); font-size: 0.9rem; margin-bottom: 24px; }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .result-box {
+    background: white;
+    border-radius: 12px;
+    padding: 14px 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  }
+  .result-box .val { font-size: 1.5rem; font-weight: 800; }
+  .result-box .lbl { font-size: 0.78rem; color: var(--gray); margin-top: 2px; }
+  .correct-val { color: var(--green); }
+  .wrong-val { color: var(--red); }
+  .pct-val { color: var(--blue); }
+
+  .btn-restart {
+    background: var(--navy);
+    color: white;
+    border: none;
+    padding: 13px 32px;
+    border-radius: 12px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-restart:hover { background: var(--blue); }
+
+  /* SECTION LABEL */
+  .section-header {
+    background: linear-gradient(135deg, var(--navy), var(--blue));
+    color: white;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  /* EMPTY STATE */
+  .no-q { text-align: center; padding: 40px; color: var(--gray); font-size: 1rem; }
+
+  @media(max-width:480px) {
+    .header h1 { font-size: 1.3rem; }
+    .result-grid { grid-template-columns: repeat(3,1fr); }
+    .nav-btn { padding: 10px 16px; font-size: 0.85rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🎓 اختبار تفاعلي</h1>
+  <p>مقرر تمويل المشاريع — 90 سؤال اختيار من متعدد</p>
+</div>
+
+<div class="tabs" id="tabs"></div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-val" id="statCurrent">0</div><div class="stat-label">السؤال الحالي</div></div>
+  <div class="stat"><div class="stat-val green" id="statCorrect">0</div><div class="stat-label">صحيح</div></div>
+  <div class="stat"><div class="stat-val red" id="statWrong">0</div><div class="stat-label">خطأ</div></div>
+  <div class="stat"><div class="stat-val" id="statRemain">0</div><div class="stat-label">متبقي</div></div>
+</div>
+
+<div class="main" id="main"></div>
+
+<div class="result-screen" id="resultScreen">
+  <div class="result-circle">
+    <div class="result-score" id="rScore">0</div>
+    <div class="result-total" id="rTotal"></div>
+  </div>
+  <div class="result-title" id="rTitle"></div>
+  <div class="result-sub" id="rSub"></div>
+  <div class="result-grid">
+    <div class="result-box"><div class="val correct-val" id="rCorrect">0</div><div class="lbl">إجابات صحيحة</div></div>
+    <div class="result-box"><div class="val wrong-val" id="rWrong">0</div><div class="lbl">إجابات خاطئة</div></div>
+    <div class="result-box"><div class="val pct-val" id="rPct">0%</div><div class="lbl">النسبة المئوية</div></div>
+  </div>
+  <button class="btn-restart" onclick="restart()">🔄 إعادة الاختبار</button>
+</div>
+
+<script>
+const SECTIONS = [
+  {
+    name: "الهيكل التمويلي",
+    short: "الهيكل",
+    questions: [
+      { q: "في النظرية التقليدية فإن النقطة المثلى تتحقق عندما تكون .........", opts: ["تكلفة الدين = صفر", "تكلفة رأس المال = أدنى مستوى", "العائد = المخاطر", "الدين = حقوق الملكية"], ans: 1 },
+      { q: "أي من التالي يمثل دائماً عيباً رئيسياً للتمويل بحقوق الملكية؟", opts: ["ارتفاع المخاطر", "الالتزام بالسداد", "زيادة الضرائب", "تخفيف الملكية"], ans: 3 },
+      { q: "إذا كانت الشركة تعاني من عدم تماثل معلومات مرتفع فإنها تميل إلى:", opts: ["إصدار أسهم", "استخدام الأرباح المحتجزة", "زيادة الدين", "بيع الأصول"], ans: 1 },
+      { q: "أي مما يلي يعكس دور الضرائب في التمويل؟", opts: ["تشجيع استخدام الدين", "تقليل أهمية الدين", "زيادة تكلفة الأسهم", "تقليل المخاطر"], ans: 0 },
+      { q: "أي من التالي يمثل قيداً في التمويل بالدين؟", opts: ["حق التصويت", "شروط تعاقدية", "انخفاض التكلفة", "المرونة"], ans: 1 },
+      { q: "الفرق الأساسي بين التمويل الداخلي والخارجي هو:", opts: ["الأول من داخل الشركة", "الثاني يعتمد على الأرباح", "الأول يعتمد على السوق", "لا يوجد فرق"], ans: 0 },
+      { q: "أي من التالي يعكس الهدف النهائي للهيكل التمويلي دائماً؟", opts: ["زيادة التكاليف", "تقليل الاستثمار", "تعظيم قيمة الشركة", "زيادة الدين"], ans: 2 },
+      { q: "أي من التالي يمثل التفسير الأدق لاختلاف نتائج النظريات في الهيكل التمويلي؟", opts: ["اختلاف طبيعة الأسواق المالية", "اختلاف الافتراضات حول الواقع الاقتصادي", "اختلاف حجم الشركات", "اختلاف نوع التمويل"], ans: 1 },
+      { q: "إذا قررت شركة إصدار أسهم رغم توفر أرباح محتجزة فإن ذلك قد يشير إلى:", opts: ["كفاءة مالية عالية", "إشارات سلبية عن تقييم الشركة", "وجود فرص استثمارية كبيرة", "انخفاض المخاطر"], ans: 1 },
+      { q: "زيادة نسبة الاقتراض تؤدي إلى:", opts: ["انخفاض المخاطر دائماً", "تقليل تكلفة رأس المال دائماً", "استقرار التدفقات النقدية", "زيادة العائد والمخاطر معاً"], ans: 3 },
+      { q: "شركة تصدر أسهماً عند ارتفاع سعرها السوقي والهدف من ذلك:", opts: ["زيادة الاستثمار", "تقليل السيطرة", "استغلال التقييم المرتفع", "زيادة الدين"], ans: 2 },
+      { q: "الهيكل التمويلي غير مؤثر في حالة:", opts: ["وجود ضرائب", "وجود مخاطر", "كمال السوق", "وجود ديون"], ans: 2 },
+    ]
+  },
+  {
+    name: "فترة الاسترداد وNPV",
+    short: "الاسترداد",
+    questions: [
+      { q: "فترة الاسترداد تعرف بأنها:", opts: ["الزمن اللازم لتحقيق أرباح صافية", "الزمن اللازم لاستعادة الاستثمار الأولي", "الزمن اللازم لتحقيق IRR", "الزمن اللازم لتعظيم NPV"], ans: 1 },
+      { q: "فترة الاسترداد المخصومة تختلف عن التقليدية لأنها:", opts: ["تستخدم القيم الحالية للتدفقات النقدية", "تستخدم الأرباح بدل التدفقات", "لا تعتمد على الزمن", "تحسب IRR مباشرة"], ans: 0 },
+      { q: "إذا زادت المخاطر فإن معدل الخصم:", opts: ["ينخفض", "يزيد", "يبقى ثابت", "يصبح صفر"], ans: 1 },
+      { q: "NPV تعتمد على:", opts: ["الأرباح", "الإيرادات", "التكاليف", "التدفقات النقدية"], ans: 3 },
+      { q: "إذا كان IRR=15% ومعدل الخصم 10% فإن:", opts: ["المشروع خاسر", "المشروع مقبول", "المشروع غير واضح", "المشروع ثابت"], ans: 1 },
+      { q: "في تقييم المشاريع إذا تعارض NPV و IRR يفضل:", opts: ["IRR", "Payback", "NPV", "PI"], ans: 2 },
+      { q: "فترة الاسترداد تعتبر أداة:", opts: ["استراتيجية طويلة الأجل", "مالية محاسبية", "أولية لتقييم المشاريع", "دقيقة جداً"], ans: 2 },
+      { q: "لا يتم أخذه في الاعتبار بعد فترة الاسترداد هو:", opts: ["الأرباح", "الزمن", "الاستثمار الأولي", "التدفقات بعد الاسترداد"], ans: 3 },
+      { q: "أحد أسباب استخدام فترة الاسترداد هو:", opts: ["دقتها العالية", "سهولة تطبيقها", "شمولها جميع العوامل", "اعتمادها على المعادلات"], ans: 1 },
+      { q: "عند زيادة المخاطر تميل الشركات إلى:", opts: ["تقليل فترة الاسترداد المقبولة", "زيادة فترة الاسترداد المقبولة", "تجاهل فترة الاسترداد", "تثبيت فترة الاسترداد"], ans: 0 },
+      { q: "إذا كانت التدفقات غير منتظمة فإن فترة الاسترداد:", opts: ["لا يمكن حسابها", "تحتاج تجميع تدريجي", "تصبح ثابتة", "تعتمد على المتوسط"], ans: 1 },
+      { q: "أفضل استخدام لفترة الاسترداد يكون عند:", opts: ["استخدامها منفردة", "تجاهلها", "دمجها مع أدوات أخرى", "استخدامها في المشاريع الصغيرة"], ans: 2 },
+    ]
+  },
+  {
+    name: "التدفقات النقدية",
+    short: "التدفقات",
+    questions: [
+      { q: "عند إعداد نموذج التدفق النقدي لمشروع استثماري فإن التدفق النقدي الابتدائي يظهر بقيمة سالبة لأنه يمثل:", opts: ["عائد تشغيلي مؤجل", "خروج نقدي لبدء الاستثمار", "مصروف غير نقدي", "ربح محاسبي غير محقق"], ans: 1 },
+      { q: "أي مما يلي يعد خطأ منهجياً خطيراً في تحليل التدفقات النقدية المتوقعة؟", opts: ["إدراج الضرائب المتوقعة", "تحديث النموذج دورياً", "إدراج المصروفات التشغيلية المتغيرة", "تكرار رأس المال العام كخروج نقدي سنوي دائم"], ans: 3 },
+      { q: "مشروع يحقق تدفقات نقدية 200,000 ريال وتكلفة الاستثمار الابتدائي 600,000 ريال فترة الاسترداد تساوي:", opts: ["سنتين", "3 سنوات", "4 سنوات", "5 سنوات"], ans: 1 },
+      { q: "في تحليل DCF يستخدم معدل الخصم أساساً من أجل:", opts: ["تحويل التدفقات المستقبلية لقيمة حالية", "تحويل الأرباح المحاسبية إلى إيرادات", "إهمال أثر المخاطر", "زيادة صافي التدفق النقدي السنوي"], ans: 0 },
+      { q: "أي عنصر من العناصر التالية يعد من التدفقات النقدية النهائية؟", opts: ["الرواتب الشهرية", "استرداد رأس المال العام", "الإيجار السنوي", "التدفقات النقدية الداخلة"], ans: 1 },
+      { q: "إذا زادت الحسابات المدينة بشكل كبير في مشروع يحقق مبيعات مرتفعة فإن الأثر النقدي المباشر غالباً هو:", opts: ["نقص السيولة", "زيادة السيولة", "انخفاض الإيرادات المحاسبية", "إلغاء الحاجة إلى التمويل"], ans: 0 },
+      { q: "أي من العبارات التالية أكثر دقة حول الأرباح المحاسبية والتدفقات النقدية؟", opts: ["الأرباح المحاسبية تساوي النقد المتاح", "التدفقات النقدية لا تتأثر بالتحصيل", "قد يربح المشروع محاسبياً ويعاني أزمة سيولة", "النقد لا يؤثر في استمرارية المشروع أو توقفه"], ans: 2 },
+      { q: "أي مما يلي يمثل خطراً في الاعتماد على سيناريو نقدي واحد فقط:", opts: ["تقليل التعقيد الحسابي", "إهمال عدم اليقين وتقلبات السوق", "تحسين دقة التنبؤ دائماً", "منع الحاجة للتحديث الدوري"], ans: 1 },
+      { q: "العلاقة المحاسبية الأساسية للتدفق النقدي الداخل للمشروع هي:", opts: ["التدفق النقدي الداخل = المبيعات النقدية – التحصيل النقدي", "التدفق النقدي الداخل = المبيعات النقدية + التحصيل النقدي", "التدفق النقدي الداخل = المبيعات النقدية + صافي التدفق", "التدفق النقدي الداخل = الرصيد النهائي – صافي التدفق"], ans: 1 },
+      { q: "إذا كانت المبيعات النقدية 30,000 ريال والمبيعات الآجلة 20,000 ريال والتحصيل من العملاء السابقين 8,000 ريال فإن التدفقات النقدية الداخلة للفترة تساوي:", opts: ["30,000 ريال", "58,000 ريال", "42,000 ريال", "38,000 ريال"], ans: 3 },
+      { q: "مشروع تكلفته الابتدائية 500,000 ريال والقيمة الحالية للتدفقات المستقبلية 620,000 ريال فإن NPV تساوي:", opts: ["120,000 سالب", "500,000 موجب", "120,000 موجب", "620,000 سالب"], ans: 2 },
+      { q: "إذا كان التدفق النقدي الداخل 900,000 ريال والخارج 720,000 ريال وزيادة رأس المال العام 60,000 ريال فإن صافي التدفق النقدي يساوي:", opts: ["180,000 ريال", "240,000 ريال", "120,000 ريال", "300,000 ريال"], ans: 2 },
+    ]
+  },
+  {
+    name: "المخاطر الكمية",
+    short: "المخاطر الكمية",
+    questions: [
+      { q: "التحليل الكمي للمخاطر يهدف إلى:", opts: ["إلغاء جميع الخسائر المحتملة", "دعم القرار الاستثماري", "تقليل عدد المستثمرين", "إيقاف عمليات التخطيط المالي"], ans: 1 },
+      { q: "التكامل في إدارة المخاطر يساعد على:", opts: ["تحسين القرارات وتحقيق أهداف المشروع", "عزل المخاطر عن أهداف المشروع", "تقليل التواصل بين أصحاب المصلحة", "تقليل التعارض بين الخطط التشغيلية"], ans: 0 },
+      { q: "قبول المخاطر يستخدم غالباً عندما:", opts: ["يكون الخطر مرتفعاً جداً", "تكون تكلفة المعالجة أعلى من أثر الخطر المتوقع", "تكون المخاطر غير قابلة للتقدير", "ترغب المنشأة بإيقاف المشروع لسبب ما"], ans: 1 },
+      { q: "استراتيجية تجنب المخاطر تعني:", opts: ["قبول نتائج المخاطر بالكامل", "نقل المسؤولية لطرف آخر", "تقليل آثار المخاطر دون إلغائها", "إيقاف النشاط أو تغيير الخطة لتفادي الخطر"], ans: 3 },
+      { q: "المخاطر التنظيمية تنتج غالباً عن:", opts: ["تقلبات الإنتاج اليومية", "تغير القوانين والأنظمة الحكومية", "انخفاض الكفاءة التشغيلية", "أخطاء الموردين"], ans: 1 },
+      { q: "المخاطر غير المنتظمة ترتبط غالباً بـ:", opts: ["الظروف الاقتصادية العامة", "العوامل السياسية العالمية", "ظروف الشركة أو القطاع المحدد", "التضخم العالمي"], ans: 2 },
+      { q: "التباين يستخدم لقياس:", opts: ["معدل النمو الاقتصادي", "حجم الاستثمار الثابت", "تشتت العوائد حول المتوسط", "نسبة السيولة النقدية"], ans: 2 },
+      { q: "نظرية المحفظة الاستثمارية لهاري ماركويتز تشير إلى:", opts: ["زيادة الأصول تؤدي حتماً لزيادة الربح", "العائد لا يرتبط بالمخاطر دائماً", "جميع الاستثمارات تحقق عوائد متساوية", "التنويع يقلل المخاطر الاستثمارية"], ans: 3 },
+      { q: "الهدف الأساسي لإدارة المخاطر المالية في المنشآت:", opts: ["تعظيم حجم الأصول الثابتة", "تقليل الخسائر المحتملة وتحقيق الاستقرار", "زيادة الأنشطة التشغيلية", "زيادة الأرباح السنوية"], ans: 1 },
+      { q: "وجود رقابة من مجلس الإدارة العليا يؤدي إلى:", opts: ["تحسين فاعلية إدارة المخاطر", "زيادة احتمالية الكفاءة", "ضعف المساءلة التنظيمية", "إلغاء الحاجة للسياسات المالية"], ans: 0 },
+      { q: "كلما اتسع التوزيع الاحتمالي للعوائد فإن ذلك يدل على:", opts: ["انخفاض درجة المخاطرة", "ارتفاع درجة المخاطرة", "استقرار التدفقات النقدية", "ارتفاع نسبة السيولة"], ans: 1 },
+      { q: "أي من الآتي يمثل مخاطر السوق:", opts: ["أخطاء العاملين الداخلية", "ضعف أنظمة الرقابة", "تقلبات العرض والطلب", "سوء الإدارة المالية"], ans: 2 },
+    ]
+  },
+  {
+    name: "إدارة المخاطر",
+    short: "إدارة المخاطر",
+    questions: [
+      { q: "أي مما يلي يعبر بدقة عن مفهوم المخاطر في الإدارة الحديثة؟", opts: ["حدث سلبي فقط", "انحراف عن الخطة التشغيلية", "حدث محتمل يؤثر سلباً أو إيجاباً", "مشكلة تم حدوثها بالفعل"], ans: 2 },
+      { q: "ما الفرق الجوهري بين إدارة المخاطر وبين تخفيف المخاطر؟", opts: ["لا يوجد فرق", "التخفيف يسبق الإدارة", "التخفيف تشمل المخاطر الإيجابية", "الإدارة إطار شامل والتخفيف جزء منه"], ans: 3 },
+      { q: "في مصفوفة الاحتمال الأثر ماذا تعني المخاطر ذات الاحتمال المنخفض والأثر العالي؟", opts: ["يتم تجاهلها", "لا تحتاج متابعة", "تعتبر مخاطر حرجة", "يتم قبولها مباشرة"], ans: 2 },
+      { q: "في دورة إدارة المخاطر ما المرحلة التي يتم فيها فهم الأسباب الجذرية للمخاطر؟", opts: ["التحليل", "التقييم", "الاستجابة", "المراقبة"], ans: 0 },
+      { q: "أي من الاستراتيجيات التالية تعني (إلغاء النشاط لتفادي الخطر)؟", opts: ["القبول", "التجنب", "التخفيف", "النقل"], ans: 1 },
+      { q: "أي من المؤشرات التالية يعد مؤشر إنذار مبكر (KRI)؟", opts: ["زيادة الشكاوى", "الأرباح السنوية", "عدد الموظفين", "عدد المنتجات"], ans: 0 },
+      { q: "في المخاطر المالية ماذا يمثل خطر السيولة؟", opts: ["تقلب الطلب", "اختراق البيانات", "عدم توفر نقد كافٍ", "مخاطر تشغيلية"], ans: 2 },
+      { q: "في تحليل السيناريوهات السيناريو المتشائم يفترض:", opts: ["أفضل النتائج", "أسوأ الظروف", "الواقع الحالي", "عدم التغيير"], ans: 1 },
+      { q: "في إدارة الأزمات المرحلة أثناء الأزمة تتضمن:", opts: ["تفعيل الخطة والتواصل", "التخطيط", "التدريب", "التقييم"], ans: 0 },
+      { q: "أي من التالي يعكس ثقافة مخاطر ناضجة؟", opts: ["إخفاء المخاطر", "اللوم الفردي", "تجاهل المشاكل", "الإبلاغ المبكر دون خوف"], ans: 3 },
+      { q: "في مصفوفة الاحتمال الأثر أي حالة تستوجب التدخل فورياً؟", opts: ["احتمال منخفض + أثر منخفض", "احتمال منخفض + أثر مرتفع", "احتمال مرتفع + أثر مرتفع", "احتمال مرتفع + أثر منخفض"], ans: 2 },
+      { q: "ما الخطأ الشائع في إدارة المخاطر والذي يؤدي إلى فشلها؟", opts: ["تحديد أولويات المخاطر", "ربط المخاطر بالأهداف", "التعامل مع السجل كوثيقة شكلية", "استخدام مؤشرات الإنذار المبكر"], ans: 2 },
+    ]
+  },
+  {
+    name: "النمذجة المالية (١)",
+    short: "النمذجة ١",
+    questions: [
+      { q: "ما هو الأقرب للتعريف الجوهري للنمذجة المالية؟", opts: ["عملية توثيق البيانات التاريخية", "أداة تحليلية لتقدير الأداء المالي المستقبلي", "برنامج محاسبي لإدخال البيانات اليومية", "وسيلة لطباعة التقارير المالية السنوية"], ans: 1 },
+      { q: "فئة تستخدم النماذج المالية لتقييم الشركات في عمليات الاستحواذ والطروحات الأولية:", opts: ["محللو الأسهم والائتمان", "المحاسبون القانونيون", "المصرفيون الاستثماريون", "مديرو الموارد البشرية"], ans: 2 },
+      { q: "يعد الأساس لتوقع الأداء المستقبلي ضمن المكونات الأساسية:", opts: ["قائمة الدخل", "قائمة التدفقات النقدية", "الميزانية العمومية", "جدول سداد الديون"], ans: 0 },
+      { q: "في بناء الافتراضات في النمذجة المالية ما الذي يجب أن تستند إليه معدلات نمو الإيرادات؟", opts: ["التدفقات النقدية الاستثمارية", "المصروفات التشغيلية", "تقديرات عشوائية", "تحليل السوق والاتجاهات"], ans: 3 },
+      { q: "ما هو الهدف الأساسي من بناء قائمة التدفقات النقدية في الشركات؟", opts: ["حساب نسب الضرائب", "تحديد القيمة العادلة للسهم", "تحديد صافي الربح المحاسبي", "توازن الميزانية وعكس الواقع التشغيلي"], ans: 3 },
+      { q: "أي من التالي يعد من مبادئ أفضل الممارسات في النمذجة المالية؟", opts: ["المرونة في التصاميم", "التعقيد الزائد للنموذج", "إهمال التوثيق لتسريع العمل", "ترميز الأرقام يدوياً داخل المعادلات"], ans: 0 },
+      { q: "ما هو النموذج المالي الذي يربط القوائم الثلاث بشكل ديناميكي ويعد أساساً لجميع النماذج الأخرى؟", opts: ["نموذج LBO", "نموذج A&M", "نموذج التنقيب عن البيانات", "نموذج القوائم المالية الثلاث"], ans: 3 },
+      { q: "أي من الآتي يعتبر من أفضل الممارسات في النمذجة المالية؟", opts: ["إدخال الأرقام يدوياً داخل المعادلات", "إخفاء الافتراضات الرئيسية", "فصل المدخلات عن المخرجات والحسابات", "استخدام أكبر عدد ممكن من أوراق العمل"], ans: 2 },
+      { q: "أي من الآتي يعد خطأً شائعاً في النمذجة المالية؟", opts: ["التعقيد الزائد في النموذج", "توثيق الافتراضات", "استخدام مراجعة مستقلة للنموذج", "فصل المدخلات عن الحسابات"], ans: 0 },
+      { q: "في نموذج LBO ما العامل الأكثر تأثيراً على العائد المتوقع للمستثمر؟", opts: ["زيادة المصروفات الإدارية", "نسبة التمويل بالدين وسرعة سداده", "انخفاض رأس المال العامل", "عدد الأسهم القائمة فقط"], ans: 1 },
+      { q: "يعد من الوظائف الأساسية لنموذج الميزانية Forecast Model:", opts: ["تحليل القضايا القانونية للشركة", "تحديد الهيكل الإداري للمؤسسة", "احتساب القيمة العادلة للأسهم", "التنبؤ بالأداء المالي المستقبلي"], ans: 3 },
+      { q: "ما السبب الرئيسي لإجراء اختبار الضغط Stress Testing في النماذج المالية؟", opts: ["تحسين تنسيق الجداول", "تقليل عدد المعادلات", "تقييم أداء النموذج تحت ظروف استثنائية", "تحليل القضايا المالية"], ans: 2 },
+    ]
+  },
+  {
+    name: "النمذجة المالية (٢)",
+    short: "النمذجة ٢",
+    questions: [
+      { q: "أي عنصر يعد الأساس الذي تعتمد عليه جميع مخرجات النموذج المالي؟", opts: ["الرسوم البيانية", "الافتراضات المالية", "القوائم التشغيلية", "أدوات التنسيق"], ans: 1 },
+      { q: "ما الوظيفة الأساسية لقائمة التدفقات النقدية داخل النموذج المالي؟", opts: ["متابعة حركة النقد الداخل والخارج", "قياس الحصة السوقية", "احتساب معدل الخصم", "تحليل أداء المنافسين"], ans: 0 },
+      { q: "ما العنصر الأكثر تأثيراً على انخفاض القيمة الحالية في نموذج DCF؟", opts: ["زيادة الإيرادات", "انخفاض المصروفات", "ارتفاع WACC", "ارتفاع EBITDA"], ans: 2 },
+      { q: "ما هو المؤشر الذي يعد مؤشراً رئيسياً لسلامة النموذج المالي؟", opts: ["توازن الميزانية العمومية", "زيادة قائمة الدخل", "زيادة حجم البيانات", "توفر البيانات التاريخية"], ans: 0 },
+      { q: "الهدف من استخدام تحليل السيناريوهات في النمذجة المالية هو:", opts: ["حذف الافتراضات غير الضرورية", "تقليل مدة بناء النموذج", "تحويل البيانات لرسوم بيانية", "اختبار عدة ظروف تشغيلية محتملة"], ans: 3 },
+      { q: "ما المقصود بالقيمة النهائية Terminal Value في تحليل DCF؟", opts: ["قيمة الأصول الثابتة", "قيمة الشركة بعد فترة التوقعات", "إجمالي التدفقات التشغيلية", "الأرباح المحتجزة المستقبلية"], ans: 1 },
+      { q: "من المخاطر التي يتم قياسها داخل النموذج المالي:", opts: ["تغير الهوية البصرية", "تقلب أسعار الفائدة", "التدفقات التشغيلية فقط", "الأرباح المحتجزة"], ans: 1 },
+      { q: "عنصر يرتبط مباشرة بـ Excel Cash Flow:", opts: ["المصروفات الرأسمالية", "عدد الأسهم القائمة", "تكلفة التسويق", "نسب السيولة"], ans: 0 },
+      { q: "الهدف من إعداد قائمة المركز المالي المتوقعة:", opts: ["تحديد حجم المبيعات اليومية", "توضيح الوضع المالي المستقبلي", "قياس رضا المستثمرين", "تحليل السوق"], ans: 1 },
+      { q: "الذي يميز محاكاة مونت كارلو عن تحليل الحساسية:", opts: ["تعتمد على متغير واحد", "لا تستخدم الافتراضات", "تقدم توزيعاً احتمالياً للنتائج", "تقتصر على تحليل التكاليف"], ans: 2 },
+      { q: "العلاقة الأساسية بين WACC والقيمة الحالية هي:", opts: ["علاقة طردية مباشرة", "لا توجد علاقة", "علاقة ثابتة", "علاقة عكسية"], ans: 3 },
+      { q: "الدالة التي تستخدم لحساب معدل العائد الداخلي هي:", opts: ["PMT", "XNPV", "IRR", "FV"], ans: 2 },
+    ]
+  },
+  {
+    name: "العقود والتمويل",
+    short: "العقود",
+    questions: [
+      { q: "الوظيفة الجوهرية لحزمة العقود في تمويل المشاريع:", opts: ["تقليل تكاليف التشغيل فقط", "رفع الإيرادات التشغيلية بصورة مباشرة", "دمج العقود لضمان استقرار المشروع", "استبدال دراسات الجدوى المالية"], ans: 2 },
+      { q: "يمثل جوهر اتفاقيات القروض في تمويل المشاريع:", opts: ["تحديد الهيكل الإداري للشركة", "تنظيم العلاقة التمويلية بين المقرض والشركة", "تحليل الاتجاه وتقييم الحصة السوقية للمشروع", "توزيع الأرباح بعد سداد القروض"], ans: 1 },
+      { q: "ما السبب لفرض التعهدات المالية في عقود القروض؟", opts: ["حماية المقرض من التدهور الائتماني", "زيادة الأرباح المحاسبية", "رفع القيمة السوقية للسهم", "تقليل الرسوم التشغيلية"], ans: 0 },
+      { q: "يعد من الضمانات المباشرة للمقرضين:", opts: ["تقييم الأداء التشغيلي", "رهن أصول المشروع", "تقارير المشروع المالية", "دراسات الجدوى المالية"], ans: 1 },
+      { q: "ما الهدف الأساسي من اتفاقيات المساهمين؟", opts: ["زيادة التدفقات النقدية", "تقليل تكاليف الاقتراض", "استبدال النظام الأساسي للشركة", "تنظيم العلاقة والحقوق بين الشركاء"], ans: 3 },
+      { q: "ما السمة الرئيسية للسندات القابلة للتحويل؟", opts: ["تمويل طويل الأجل غير مسترد", "إمكانية تحويل الدين إلى أسهم مستقبلاً", "عدم وجود فوائد عليها", "ارتباطها بالمشاريع الحكومية فقط"], ans: 1 },
+    ]
+  }
+];
+
+// State
+let currentSection = 0;
+let currentQ = 0;
+let answered = {};
+let correctCount = 0;
+let wrongCount = 0;
+let quizMode = 'all'; // 'all' or section index
+
+// Build all questions flat
+let allQuestions = [];
+SECTIONS.forEach((sec, si) => {
+  sec.questions.forEach((q, qi) => {
+    allQuestions.push({ ...q, sectionIdx: si, sectionName: sec.name, localIdx: qi });
+  });
+});
+
+let activeQuestions = allQuestions;
+let activeSection = -1; // -1 = all
+
+function buildTabs() {
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = '';
+  // All tab
+  const allBtn = document.createElement('button');
+  allBtn.className = 'tab-btn' + (activeSection === -1 ? ' active' : '');
+  allBtn.textContent = 'الكل (90)';
+  allBtn.onclick = () => switchSection(-1);
+  tabs.appendChild(allBtn);
+
+  SECTIONS.forEach((sec, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (activeSection === i ? ' active' : '');
+    btn.textContent = sec.short + ' (12)';
+    if (i === 7) btn.textContent = sec.short + ' (6)';
+    btn.onclick = () => switchSection(i);
+    tabs.appendChild(btn);
+  });
+}
+
+function switchSection(idx) {
+  activeSection = idx;
+  if (idx === -1) {
+    activeQuestions = allQuestions;
+  } else {
+    activeQuestions = allQuestions.filter(q => q.sectionIdx === idx);
+  }
+  currentQ = 0;
+  answered = {};
+  correctCount = 0;
+  wrongCount = 0;
+  document.getElementById('resultScreen').style.display = 'none';
+  document.getElementById('main').style.display = '';
+  buildTabs();
+  render();
+}
+
+function render() {
+  updateStats();
+  const main = document.getElementById('main');
+  if (activeQuestions.length === 0) {
+    main.innerHTML = '<div class="no-q">لا توجد أسئلة في هذا القسم</div>';
+    return;
+  }
+
+  const q = activeQuestions[currentQ];
+  const key = `${q.sectionIdx}-${q.localIdx}`;
+  const isAnswered = answered[key] !== undefined;
+  const letters = ['أ', 'ب', 'ج', 'د'];
+
+  let html = `<div class="section-header">${q.sectionName}</div>`;
+  html += `<div class="question-card">
+    <div class="q-meta">
+      <span class="q-number">السؤال ${currentQ + 1} من ${activeQuestions.length}</span>
+      <span class="q-section">${q.sectionName}</span>
+    </div>
+    <div class="q-text">${q.q}</div>
+    <div class="options" id="opts">`;
+
+  q.opts.forEach((opt, i) => {
+    let cls = '';
+    if (isAnswered) {
+      if (i === q.ans) cls = ' correct';
+      else if (answered[key] === i && i !== q.ans) cls = ' wrong';
+    }
+    html += `<button class="option-btn${cls}" ${isAnswered ? 'disabled' : ''} onclick="answer(${i})">
+      <span class="opt-letter">${letters[i]}</span>
+      <span>${opt}</span>
+    </button>`;
+  });
+
+  html += `</div>`;
+
+  if (isAnswered) {
+    const correct = answered[key] === q.ans;
+    html += `<div class="feedback ${correct ? 'correct' : 'wrong'}" style="display:block">
+      ${correct ? '✅ إجابة صحيحة!' : `❌ الإجابة الصحيحة: ${letters[q.ans]}. ${q.opts[q.ans]}`}
+    </div>`;
+  }
+
+  html += `</div>`;
+
+  // Nav buttons
+  html += `<div class="nav-btns">`;
+  if (currentQ > 0) html += `<button class="nav-btn btn-prev" onclick="prev()">→ السابق</button>`;
+  if (currentQ < activeQuestions.length - 1) {
+    html += `<button class="nav-btn btn-next" onclick="next()">التالي ←</button>`;
+  } else {
+    html += `<button class="nav-btn btn-result" onclick="showResult()">🏆 عرض النتيجة</button>`;
+  }
+  html += `</div>`;
+
+  main.innerHTML = html;
+
+  // Progress
+  const pct = ((currentQ + 1) / activeQuestions.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function answer(idx) {
+  const q = activeQuestions[currentQ];
+  const key = `${q.sectionIdx}-${q.localIdx}`;
+  if (answered[key] !== undefined) return;
+  answered[key] = idx;
+  if (idx === q.ans) correctCount++;
+  else wrongCount++;
+  render();
+}
+
+function next() {
+  if (currentQ < activeQuestions.length - 1) { currentQ++; render(); }
+}
+function prev() {
+  if (currentQ > 0) { currentQ--; render(); }
+}
+
+function updateStats() {
+  const answered_count = Object.keys(answered).length;
+  document.getElementById('statCurrent').textContent = currentQ + 1;
+  document.getElementById('statCorrect').textContent = correctCount;
+  document.getElementById('statWrong').textContent = wrongCount;
+  document.getElementById('statRemain').textContent = activeQuestions.length - answered_count;
+}
+
+function showResult() {
+  const total = activeQuestions.length;
+  const pct = Math.round((correctCount / total) * 100);
+  let title = '', sub = '';
+  if (pct >= 90) { title = '🏆 ممتاز!'; sub = 'أداء رائع، أنت تتقن المادة بشكل ممتاز.'; }
+  else if (pct >= 75) { title = '✨ جيد جداً!'; sub = 'مستوى جيد جداً، استمر في المراجعة.'; }
+  else if (pct >= 60) { title = '👍 جيد'; sub = 'مستوى جيد، راجع الأسئلة التي أخطأت فيها.'; }
+  else { title = '📚 تحتاج مراجعة'; sub = 'راجع المادة وأعد الاختبار مرة أخرى.'; }
+
+  document.getElementById('rScore').textContent = correctCount;
+  document.getElementById('rTotal').textContent = `من ${total}`;
+  document.getElementById('rTitle').textContent = title;
+  document.getElementById('rSub').textContent = sub;
+  document.getElementById('rCorrect').textContent = correctCount;
+  document.getElementById('rWrong').textContent = wrongCount;
+  document.getElementById('rPct').textContent = pct + '%';
+
+  document.getElementById('main').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'block';
+}
+
+function restart() {
+  currentQ = 0;
+  answered = {};
+  correctCount = 0;
+  wrongCount = 0;
+  document.getElementById('resultScreen').style.display = 'none';
+  document.getElementById('main').style.display = '';
+  render();
+}
+
+// Init
+buildTabs();
+render();
+</script>
+</body>
+</html>
